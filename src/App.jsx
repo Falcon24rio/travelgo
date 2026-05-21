@@ -87,8 +87,8 @@ function App() {
 
       <div className="min-h-screen bg-gray-100">
 
-        {/* NAVBAR */}
-        <nav className="bg-gradient-to-r from-blue-700 to-cyan-500 backdrop-blur-xl text-white px-5 md:px-10 py-4 flex justify-between items-center fixed top-0 left-0 w-full z-50 shadow-2xl border-b border-white/10">
+        {/* Navbar */}
+        <nav className="bg-gradient-to-r from-blue-700 to-cyan-500 text-white px-5 md:px-10 py-4 flex justify-between items-center fixed top-0 left-0 w-full z-50 shadow-2xl">
 
           {/* Logo */}
           <Link
@@ -96,24 +96,16 @@ function App() {
             className="flex items-center gap-3"
           >
 
-            <div className="bg-white/20 p-3 rounded-2xl">
-
-              <FaPlaneDeparture className="text-2xl md:text-3xl" />
-
-            </div>
+            <FaPlaneDeparture className="text-3xl" />
 
             <div>
 
-              <h1 className="text-2xl md:text-3xl font-black tracking-wide">
-
+              <h1 className="text-2xl md:text-3xl font-black">
                 TravelGo
-
               </h1>
 
-              <p className="text-white/80 text-xs md:text-sm">
-
-                Luxury Travel Platform
-
+              <p className="text-sm text-white/80">
+                Explore The World
               </p>
 
             </div>
@@ -125,50 +117,44 @@ function App() {
 
             <Link
               to="/"
-              className="hover:text-gray-200 transition font-semibold"
+              className="hover:text-gray-200 transition"
             >
-
               Home
-
             </Link>
 
             <Link
               to="/packages"
-              className="hover:text-gray-200 transition font-semibold"
+              className="hover:text-gray-200 transition"
             >
-
               Packages
-
             </Link>
 
             <Link
               to="/contact"
-              className="hover:text-gray-200 transition font-semibold"
+              className="hover:text-gray-200 transition"
             >
-
               Contact
-
             </Link>
 
-            {/* Auth Buttons */}
             {isLoggedIn ? (
 
               <div className="flex items-center gap-3">
 
-                {/* Profile */}
                 <Link
                   to="/profile"
-                  className="bg-white text-blue-700 px-5 py-2.5 rounded-2xl font-bold hover:bg-gray-100 transition shadow-lg"
+                  className="bg-white text-blue-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-100 transition"
                 >
-
                   Profile
-
                 </Link>
 
-               
-                
-
-                
+                <button
+                  onClick={
+                    handleLogout
+                  }
+                  className="bg-red-500 px-4 py-2 rounded-xl font-bold hover:bg-red-600 transition"
+                >
+                  Logout
+                </button>
 
               </div>
 
@@ -176,11 +162,9 @@ function App() {
 
               <Link
                 to="/auth"
-                className="bg-white text-blue-700 px-5 py-2.5 rounded-2xl font-bold hover:bg-gray-100 transition shadow-lg"
+                className="bg-white text-blue-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-100 transition"
               >
-
-                Login / Register
-
+                Login
               </Link>
 
             )}
@@ -189,7 +173,7 @@ function App() {
 
         </nav>
 
-        {/* ROUTES */}
+        {/* Routes */}
         <Routes>
 
           {/* Home */}
@@ -206,7 +190,7 @@ function App() {
 
           {/* Package Details */}
           <Route
-            path="/packages/:id"
+            path="/packages/:name"
             element={
               <PackageDetails />
             }
@@ -236,7 +220,7 @@ function App() {
             element={<AuthPage />}
           />
 
-          {/* Profile */}
+          {/* Dashboard */}
           <Route
             path="/profile"
             element={
