@@ -2,9 +2,11 @@ import { useParams, Link } from "react-router-dom";
 import packagesData from "../data/packagesData";
 const PackageDetails = () => {
 const { name } = useParams();
+const decodedName = decodeURIComponent(name);
 const selectedPackage = packagesData.find(
-(tour) =>
-tour.name === decodeURIComponent(name)
+  (tour) =>
+    tour.name.trim().toLowerCase() ===
+    decodedName.trim().toLowerCase()
 );
 10
 if (!selectedPackage) {
