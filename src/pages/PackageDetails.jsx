@@ -1,6 +1,5 @@
 import { useParams, Link } from "react-router-dom";
 import packagesData from "../data/packagesData";
-
 const PackageDetails = () => {
   const { name } = useParams();
 
@@ -157,11 +156,9 @@ const PackageDetails = () => {
 
           {/* Button */}
           <Link
-            to="/booking"
-            state={{
-              packageData:
-                selectedPackage,
-            }}
+  to={`/booking?package=${encodeURIComponent(
+    selectedPackage.name
+  )}`}
           >
             <button className="mt-10 bg-blue-600 text-white px-8 py-4 rounded-2xl text-xl hover:bg-blue-700 hover:scale-105 duration-300">
               Book Now

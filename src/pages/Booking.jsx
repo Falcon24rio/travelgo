@@ -1,37 +1,31 @@
 import {
-  useLocation,
+  useSearchParams,
   Navigate,
 } from "react-router-dom";
 
-import {
-  useState,
-} from "react";
+import packagesData from "../data/packagesData";
 
 const Booking = () => {
 
-  const location =
-    useLocation();
-
-  const packageData =
-    location.state?.packageData;
-
   const [
-    name,
-    setName,
-  ] = useState("");
+    searchParams,
+  ] = useSearchParams();
 
-  const [
-    email,
-    setEmail,
-  ] = useState("");
+  const packageName =
+    searchParams.get(
+      "package"
+    );
 
-  const [
-    phone,
-    setPhone,
-  ] = useState("");
+  const selectedPackage =
+    packagesData.find(
+      (tour) =>
+        tour.name ===
+        decodeURIComponent(
+          packageName || ""
+        )
+    );
 
-  /* If package missing */
-  if (!packageData) {
+  if (!selectedPackage) {
 
     return (
       <Navigate
@@ -40,17 +34,6 @@ const Booking = () => {
     );
 
   }
-
-  const handleBooking =
-    (e) => {
-
-      e.preventDefault();
-
-      alert(
-        "Booking Successful 🎉"
-      );
-
-    };
 
   return (
 
@@ -64,79 +47,51 @@ const Booking = () => {
 
         </h1>
 
-        {/* Package */}
-        <div className="bg-blue-50 p-6 rounded-2xl mb-8">
+        <div className="bg-blue-50 p-6 rounded-2xl">
 
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-3xl font-bold">
 
-            {packageData.name}
+            {selectedPackage.name}
 
           </h2>
 
-          <p className="text-blue-600 text-xl mt-2">
+          <p className="text-xl text-blue-600 mt-3">
 
-            {packageData.price}
+            {selectedPackage.price}
 
           </p>
 
-          <p className="text-gray-600 mt-2">
+          <p className="mt-2 text-gray-600">
 
-            {packageData.days}
+            {selectedPackage.days}
 
           </p>
 
         </div>
 
-        {/* Form */}
-        <form
-          onSubmit={
-            handleBooking
-          }
-          className="space-y-5"
-        >
+        <form className="mt-10 space-y-5">
 
           <input
             type="text"
             placeholder="Full Name"
-            required
-            value={name}
-            onChange={(e) =>
-              setName(
-                e.target.value
-              )
-            }
             className="w-full p-4 rounded-2xl border outline-none"
           />
 
           <input
             type="email"
             placeholder="Email Address"
-            required
-            value={email}
-            onChange={(e) =>
-              setEmail(
-                e.target.value
-              )
-            }
             className="w-full p-4 rounded-2xl border outline-none"
           />
 
           <input
             type="tel"
             placeholder="Phone Number"
-            required
-            value={phone}
-            onChange={(e) =>
-              setPhone(
-                e.target.value
-              )
-            }
             className="w-full p-4 rounded-2xl border outline-none"
           />
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-4 rounded-2xl text-xl font-bold hover:scale-105 duration-300"
+            className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-4 rounded-2xl text-xl font-bold"
           >
 
             Confirm Booking
