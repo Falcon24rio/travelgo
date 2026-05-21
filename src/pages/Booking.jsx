@@ -1,15 +1,13 @@
 import {
   useSearchParams,
-  Navigate,
 } from "react-router-dom";
 
 import packagesData from "../data/packagesData";
 
 const Booking = () => {
 
-  const [
-    searchParams,
-  ] = useSearchParams();
+  const [searchParams] =
+    useSearchParams();
 
   const packageName =
     searchParams.get(
@@ -25,21 +23,11 @@ const Booking = () => {
         )
     );
 
-  if (!selectedPackage) {
-
-    return (
-      <Navigate
-        to="/packages"
-      />
-    );
-
-  }
-
   return (
 
-    <div className="bg-gray-100 min-h-screen pt-28 p-5">
+    <div className="min-h-screen bg-gray-100 pt-28 p-5">
 
-      <div className="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-2xl">
+      <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl p-8">
 
         <h1 className="text-4xl font-bold text-center mb-8">
 
@@ -47,29 +35,41 @@ const Booking = () => {
 
         </h1>
 
-        <div className="bg-blue-50 p-6 rounded-2xl">
+        {selectedPackage ? (
 
-          <h2 className="text-3xl font-bold">
+          <div className="bg-blue-50 p-6 rounded-2xl mb-8">
 
-            {selectedPackage.name}
+            <h2 className="text-3xl font-bold">
 
-          </h2>
+              {selectedPackage.name}
 
-          <p className="text-xl text-blue-600 mt-3">
+            </h2>
 
-            {selectedPackage.price}
+            <p className="text-xl text-blue-600 mt-3">
 
-          </p>
+              {selectedPackage.price}
 
-          <p className="mt-2 text-gray-600">
+            </p>
 
-            {selectedPackage.days}
+            <p className="mt-2 text-gray-600">
 
-          </p>
+              {selectedPackage.days}
 
-        </div>
+            </p>
 
-        <form className="mt-10 space-y-5">
+          </div>
+
+        ) : (
+
+          <div className="bg-red-100 text-red-600 p-5 rounded-2xl mb-8">
+
+            Package Not Found
+
+          </div>
+
+        )}
+
+        <form className="space-y-5">
 
           <input
             type="text"
