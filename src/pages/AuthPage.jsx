@@ -4,77 +4,63 @@ import {
 
 import {
   useNavigate,
-  Link,
+  useLocation,
 } from "react-router-dom";
 
 import {
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 
 import {
-  doc,
-  setDoc,
-  getDoc,
-} from "firebase/firestore";
-
-import {
   auth,
-  db,
 } from "../firebase";
-
-import {
-  FaPlaneDeparture,
-  FaUserShield,
-} from "react-icons/fa";
 
 const AuthPage = () => {
 
   const navigate =
     useNavigate();
 
-  /* Modes */
-  const [mode, setMode] =
-    useState("login");
+  const location =
+    useLocation();
 
-  /*
-    Modes:
-    login
-    register
-    admin
-  */
+  const [
+    isLogin,
+    setIsLogin,
+  ] = useState(true);
 
-  /* States */
-  const [name, setName] =
-    useState("");
+  const [
+    email,
+    setEmail,
+  ] = useState("");
 
-  const [phone, setPhone] =
-    useState("");
+  const [
+    password,
+    setPassword,
+  ] = useState("");
 
-  const [email, setEmail] =
-    useState("");
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
-  const [password, setPassword] =
-    useState("");
+  const [
+    error,
+    setError,
+  ] = useState("");
 
-  const [loading, setLoading] =
-    useState(false);
-
-  /* Submit */
-  const handleSubmit =
+  const handleAuth =
     async (e) => {
 
       e.preventDefault();
 
+      setLoading(true);
+
+      setError("");
+
       try {
 
-        setLoading(true);
-
-        /* USER LOGIN */
-        if (
-          mode ===
-          "login"
-        ) {
+        if (isLogin) {
 
           await signInWithEmailAndPassword(
             auth,
@@ -82,473 +68,140 @@ const AuthPage = () => {
             password
           );
 
-          alert(
-            "Login Successful"
-          );
+        } else {
 
-          navigate("/");
+          await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
 
         }
 
-        /* USER REGISTER */
-        else if (
-          mode ===
-          "register"
-        ) {
-
-          const userCredential =
-            await createUserWithEmailAndPassword(
-              auth,
-              email,
-              password
-            );
-
-          const user =
-            userCredential.user;
-
-          await setDoc(
-            doc(
-              db,
-              "users",
-              user.uid
-            ),
-            {
-
-              uid:
-                user.uid,
-
-              name,
-
-              email,
-
-              phone,
-
-              role:
-                "user",
-
-              photo:
-                "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-
-              createdAt:
-                new Date(),
-
-            }
-          );
-
-          alert(
-            "Registration Successful"
-          );
-
-          navigate("/");
-
-        }
-
-        /* ADMIN LOGIN */
-        else {
-
-          const userCredential =
-            await signInWithEmailAndPassword(
-              auth,
-              email,
-              password
-            );
-
-          const user =
-            userCredential.user;
-
-          const userRef =
-            doc(
-              db,
-              "users",
-              user.uid
-            );
-
-          const userSnap =
-            await getDoc(
-              userRef
-            );
-
-          if (
-            userSnap.exists() &&
-            userSnap.data()
-              .role ===
-              "admin"
-          ) {
-
-            alert(
-              "Admin Login Successful"
-            );
-
-            navigate(
-              "/admin"
-            );
-
-          } else {
-
-            alert(
-              "Unauthorized Admin Access"
-            );
-
-          }
-
-        }
-
-      } catch (
-        error
-      ) {
-
-        console.log(
-          error
+        navigate(
+          location.state?.from
+            ?.pathname ||
+            "/"
         );
 
-        alert(
-          error.message
+      } catch (err) {
+
+        setError(
+          err.message
         );
-
-      } finally {
-
-        setLoading(false);
 
       }
+
+      setLoading(false);
 
     };
 
   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center p-5 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-black flex items-center justify-center px-5 py-20">
 
-      {/* Glow Effects */}
-      <div className="absolute w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl top-10 left-10"></div>
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/10 rounded-[35px] p-8 shadow-2xl">
 
-      <div className="absolute w-96 h-96 bg-blue-600/20 rounded-full blur-3xl bottom-10 right-10"></div>
+        {/* Heading */}
+        <h1 className="text-4xl font-black text-center text-white">
 
-      {/* Main Card */}
-      <div className="w-full max-w-6xl bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[40px] overflow-hidden shadow-[0_20px_80px_rgba(0,0,0,0.5)] grid grid-cols-1 lg:grid-cols-2">
+          TravelGo
 
-        {/* Left Side */}
-        <div className="hidden lg:flex flex-col justify-center p-16 text-white relative">
+        </h1>
 
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10"></div>
+        <p className="text-center text-gray-300 mt-3">
 
-          <div className="relative z-10">
+          {isLogin
+            ? "Login to continue your journey"
+            : "Create your travel account"}
 
-            {/* Logo */}
-            <div className="flex items-center gap-4">
+        </p>
 
-              <div className="bg-white/10 p-5 rounded-3xl border border-white/20">
+        {/* Error */}
+        {error && (
 
-                <FaPlaneDeparture className="text-5xl text-cyan-300" />
+          <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-2xl mt-6 text-sm">
 
-              </div>
-
-              <div>
-
-                <h1 className="text-5xl font-black tracking-wide">
-
-                  TravelGo
-
-                </h1>
-
-                <p className="text-cyan-200 mt-2">
-
-                  Luxury Travel Platform
-
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* Headline */}
-            <h2 className="mt-14 text-5xl font-black leading-tight">
-
-              Discover
-              <br />
-
-              Your Dream
-              <br />
-
-              Destination ✈️
-
-            </h2>
-
-            <p className="mt-8 text-lg text-gray-300 leading-relaxed">
-
-              Experience premium travel packages,
-              luxury stays,
-              unforgettable adventures and seamless bookings with TravelGo.
-
-            </p>
-
-            {/* Features */}
-            <div className="mt-12 space-y-5">
-
-              <div className="bg-white/10 border border-white/10 backdrop-blur-lg p-5 rounded-2xl">
-
-                🌍 30+ International & Domestic Destinations
-
-              </div>
-
-              <div className="bg-white/10 border border-white/10 backdrop-blur-lg p-5 rounded-2xl">
-
-                🏨 Luxury Hotels & Personalized Experiences
-
-              </div>
-
-              <div className="bg-white/10 border border-white/10 backdrop-blur-lg p-5 rounded-2xl">
-
-                💳 Secure Razorpay Payments & Real-Time Bookings
-
-              </div>
-
-            </div>
+            {error}
 
           </div>
 
-        </div>
+        )}
 
-        {/* Right Side */}
-        <div className="bg-white p-8 md:p-14 flex flex-col justify-center">
+        {/* Form */}
+        <form
+          onSubmit={
+            handleAuth
+          }
+          className="mt-8 space-y-5"
+        >
 
-          {/* Top Logo Mobile */}
-          <div className="lg:hidden flex justify-center mb-10">
-
-            <div className="bg-blue-600 p-5 rounded-3xl shadow-xl">
-
-              <FaPlaneDeparture className="text-4xl text-white" />
-
-            </div>
-
-          </div>
-
-          {/* Tabs */}
-          <div className="bg-gray-100 p-2 rounded-3xl flex items-center gap-2 mb-10 shadow-inner">
-
-            <button
-              onClick={() =>
-                setMode(
-                  "login"
-                )
-              }
-              className={`flex-1 py-4 rounded-2xl font-bold transition-all duration-300 ${
-                mode ===
-                "login"
-                  ? "bg-blue-600 text-white shadow-lg scale-[1.02]"
-                  : "text-gray-600"
-              }`}
-            >
-
-              User Login
-
-            </button>
-
-            <button
-              onClick={() =>
-                setMode(
-                  "register"
-                )
-              }
-              className={`flex-1 py-4 rounded-2xl font-bold transition-all duration-300 ${
-                mode ===
-                "register"
-                  ? "bg-blue-600 text-white shadow-lg scale-[1.02]"
-                  : "text-gray-600"
-              }`}
-            >
-
-              Register
-
-            </button>
-
-            <button
-              onClick={() =>
-                setMode(
-                  "admin"
-                )
-              }
-              className={`flex-1 py-4 rounded-2xl font-bold transition-all duration-300 ${
-                mode ===
-                "admin"
-                  ? "bg-red-500 text-white shadow-lg scale-[1.02]"
-                  : "text-gray-600"
-              }`}
-            >
-
-              Admin
-
-            </button>
-
-          </div>
-
-          {/* Title */}
-          <div className="text-center">
-
-            {mode ===
-            "admin" ? (
-
-              <div className="bg-red-100 text-red-500 w-24 h-24 rounded-full flex items-center justify-center mx-auto shadow-lg">
-
-                <FaUserShield className="text-5xl" />
-
-              </div>
-
-            ) : (
-
-              <div className="bg-blue-100 text-blue-600 w-24 h-24 rounded-full flex items-center justify-center mx-auto shadow-lg">
-
-                <FaPlaneDeparture className="text-5xl" />
-
-              </div>
-
-            )}
-
-            <h2 className="text-4xl font-black mt-8">
-
-              {mode ===
-              "login"
-                ? "Welcome Back"
-                : mode ===
-                  "register"
-                ? "Create Account"
-                : "Admin Login"}
-
-            </h2>
-
-            <p className="text-gray-500 mt-4 text-lg">
-
-              {mode ===
-              "admin"
-                ? "Authorized company access only"
-                : "Continue your luxury travel experience"}
-
-            </p>
-
-          </div>
-
-          {/* Form */}
-          <form
-            onSubmit={
-              handleSubmit
+          {/* Email */}
+          <input
+            type="email"
+            placeholder="Email Address"
+            required
+            value={email}
+            onChange={(e) =>
+              setEmail(
+                e.target.value
+              )
             }
-            className="mt-10 space-y-6"
+            className="w-full p-4 rounded-2xl bg-white text-black placeholder-gray-500 outline-none"
+          />
+
+          {/* Password */}
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+            className="w-full p-4 rounded-2xl bg-white text-black placeholder-gray-500 outline-none"
+          />
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-4 rounded-2xl text-xl font-bold hover:scale-105 duration-300"
           >
 
-            {/* Register Fields */}
-            {mode ===
-              "register" && (
+            {loading
+              ? "Please wait..."
+              : isLogin
+              ? "Login"
+              : "Register"}
 
-              <>
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  value={name}
-                  onChange={(e) =>
-                    setName(
-                      e.target.value
-                    )
-                  }
-                  className="w-full p-5 rounded-2xl border border-gray-300 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 shadow-sm"
-                  required
-                />
+          </button>
 
-                <input
-                  type="tel"
-                  placeholder="Phone Number"
-                  value={phone}
-                  onChange={(e) =>
-                    setPhone(
-                      e.target.value
-                    )
-                  }
-                  className="w-full p-5 rounded-2xl border border-gray-300 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 shadow-sm"
-                  required
-                />
-              </>
-            )}
+        </form>
 
-            {/* Email */}
-            <input
-              type="email"
-              placeholder={
-                mode ===
-                "admin"
-                  ? "Admin Email"
-                  : "Email Address"
-              }
-              value={email}
-              onChange={(e) =>
-                setEmail(
-                  e.target.value
-                )
-              }
-              className="w-full p-5 rounded-2xl border border-gray-300 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 shadow-sm"
-              required
-            />
+        {/* Toggle */}
+        <div className="text-center mt-8 text-gray-300">
 
-            {/* Password */}
-            <input
-              type="password"
-              placeholder={
-                mode ===
-                "admin"
-                  ? "Admin Password"
-                  : "Password"
-              }
-              value={password}
-              onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
-              }
-              className="w-full p-5 rounded-2xl border border-gray-300 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 shadow-sm"
-              required
-            />
+          {isLogin
+            ? "Don't have an account?"
+            : "Already have an account?"}
 
-            {/* Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full py-5 rounded-2xl text-xl font-black text-white transition-all duration-300 shadow-2xl hover:scale-[1.02] ${
-                mode ===
-                "admin"
-                  ? "bg-gradient-to-r from-red-500 to-pink-600"
-                  : "bg-gradient-to-r from-blue-600 to-cyan-500"
-              }`}
-            >
+          <button
+            onClick={() =>
+              setIsLogin(
+                !isLogin
+              )
+            }
+            className="ml-2 text-cyan-400 font-bold"
+          >
 
-              {loading
-                ? "Please Wait..."
-                : mode ===
-                  "login"
-                ? "Login"
-                : mode ===
-                  "register"
-                ? "Create Account"
-                : "Admin Login"}
+            {isLogin
+              ? "Register"
+              : "Login"}
 
-            </button>
-
-          </form>
-
-          {/* Footer */}
-          <div className="mt-10 text-center">
-
-            <p className="text-gray-500">
-
-              Secure Authentication Powered by Firebase 🔥
-
-            </p>
-
-            <Link
-              to="/"
-              className="inline-block mt-5 text-blue-600 font-bold hover:underline"
-            >
-
-              ← Back to Home
-
-            </Link>
-
-          </div>
+          </button>
 
         </div>
 
